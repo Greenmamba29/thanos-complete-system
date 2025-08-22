@@ -1,0 +1,46 @@
+
+{
+  "name": "thanos-complete-system",
+  "version": "1.0.0",
+  "description": "Complete THANOS file organization system with one-click AI-powered organization",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd web-app && yarn dev",
+    "build": "cd web-app && yarn build", 
+    "start": "cd web-app && yarn start",
+    "lint": "cd web-app && yarn lint",
+    "test": "cd web-app && yarn test",
+    "install:all": "cd web-app && yarn install",
+    "setup": "npm run install:all && cd web-app && npx prisma generate",
+    "deploy:agents": "python scripts/deploy-agents.py",
+    "backup:db": "scripts/backup-db.sh",
+    "demo": "node scripts/demo-setup.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/thanos-complete-system.git"
+  },
+  "keywords": [
+    "file-organization",
+    "ai",
+    "automation",
+    "nextjs",
+    "abacus-ai",
+    "file-management",
+    "photo-organization",
+    "document-management"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/your-username/thanos-complete-system/issues"
+  },
+  "homepage": "https://github.com/your-username/thanos-complete-system#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=1.22.0"
+  }
+}

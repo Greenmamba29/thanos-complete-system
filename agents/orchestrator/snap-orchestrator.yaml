@@ -1,0 +1,149 @@
+
+# SnapOrchestrator Agent Configuration
+# Main orchestration agent for THANOS file organization system
+
+agent_name: SnapOrchestrator
+version: "1.0.0"
+description: "Orchestrates the complete file organization pipeline for THANOS system"
+
+input_schema:
+  job_id: 
+    type: string
+    format: uuid
+    description: "Unique identifier for the organization job"
+  user_id:
+    type: string
+    format: uuid
+    description: "User identifier for permissions and quotas"
+  org_id:
+    type: string
+    format: uuid
+    description: "Organization identifier"
+  tier:
+    type: string
+    enum: ["Standard", "Pro", "Veteran"]
+    description: "User tier determining processing limits and features"
+  scope:
+    type: string
+    description: "File scope or path to organize"
+  dry_run:
+    type: boolean
+    default: false
+    description: "Whether to run in simulation mode without making changes"
+  max_files:
+    type: integer
+    default: 1000
+    description: "Maximum number of files to process"
+  preferences:
+    type: object
+    properties:
+      create_people_folders:
+        type: boolean
+        default: true
+      create_date_folders:
+        type: boolean
+        default: true
+      create_type_folders:
+        type: boolean
+        default: true
+
+output_schema:
+  summary:
+    type: object
+    properties:
+      total_files:
+        type: integer
+        description: "Total number of files processed"
+      folders_created:
+        type: integer
+        description: "Number of new folders created"
+      files_moved:
+        type: integer
+        description: "Number of files successfully moved"
+      review_queue:
+        type: integer
+        description: "Files requiring manual review"
+      processing_time:
+        type: integer
+        description: "Total processing time in seconds"
+      undo_bundle:
+        type: array
+        items:
+          type: object
+        description: "Rollback information for all operations"
+      errors:
+        type: array
+        items:
+          type: string
+        description: "List of any errors encountered"
+
+# Orchestration Flow Configuration
+orchestration_steps:
+  - name: "safety_check"
+    tool: "guard_rail"
+    required: true
+    timeout: 30
+    
+  - name: "file_discovery"
+    tool: "list_files"
+    required: true
+    timeout: 120
+    
+  - name: "metadata_extraction"
+    tools: ["head_file", "extract_exif", "extract_text"]
+    parallel: true
+    timeout: 300
+    
+  - name: "ai_classification"
+    tools: ["detect_faces", "people_match", "classify_file"]
+    parallel: true
+    timeout: 600
+    
+  - name: "folder_planning"
+    tool: "suggest_folder"
+    required: true
+    timeout: 60
+    
+  - name: "organization"
+    tools: ["ensure_folder", "move_file"]
+    required: true
+    timeout: 900
+    
+  - name: "indexing"
+    tools: ["write_tags", "journal_link"]
+    required: false
+    timeout: 120
+    
+  - name: "audit_logging"
+    tool: "log_activity"
+    required: true
+    timeout: 30
+
+# Error Handling
+error_handling:
+  max_retries: 3
+  rollback_on_failure: true
+  continue_on_non_critical: true
+  
+# Performance Settings
+performance:
+  batch_size: 50
+  max_parallel: 10
+  memory_limit: "4GB"
+  
+# Tier-Specific Limits
+tier_limits:
+  Standard:
+    max_files: 100
+    max_processing_time: 300  # 5 minutes
+    features: ["basic_classification", "folder_creation"]
+    
+  Pro:
+    max_files: 1000
+    max_processing_time: 1800  # 30 minutes
+    features: ["basic_classification", "folder_creation", "face_recognition", "ocr"]
+    
+  Veteran:
+    max_files: 10000
+    max_processing_time: 7200  # 2 hours
+    features: ["all_features", "voice_processing", "advanced_analytics", "auto_scheduling"]
